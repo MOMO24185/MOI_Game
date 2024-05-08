@@ -1,17 +1,55 @@
-const fastify = require('fastify')({logger: true})
-const path = require('node:path')
+const express = require('express')
+const http = require('http')
+const path = require('path')
+const socketIO = require('socket.io')
 
-fastify.register(require('@fastify/static'), {
-  root: path.join(__dirname, 'public')
+const app = express()
+var server = http.Server(app)
+var io = socketIO(server, {
+  pingTimeout: 60000,
 })
 
-// Route to serve the index.html file
-fastify.get('/', function (req, reply) {
-  reply.sendFile('index.html') // Fastify's reply.sendFile automatically resolves the path relative to the root
+app.set('port', 8080)
+app.use('/static', express.static(__dirname + '/static'))
+
+app.get('/', function (request, response) {
+  response.sendFile(path.join(__dirname, 'index.html'))
 })
 
-// Start the Fastify server
-fastify.listen({ port: 3000 }, (err, address) => {
-	if (err) throw err
-	// Server is now listening on ${address}
+server.listen(8080, function () {
+  console.log('Starting server on port 8080')
+})
+
+var players = {}
+
+io.on('connection', function (socket) {
+  console.log('player [' + socket.id + '] connected')
+
+  players[socket.id] = {
+    rotation: 0,
+    x: 60,
+    y: 40,
+    playerId: socket.id,
+    color: getRandomColor()
+  }
+  socket.emit('currentPlayers', players)
+  socket.broadcast.emit('newPlayer', players[socket.id])
+
+  socket.on('disconnect', function () {
+    console.log('player [' + socket.id + '] disconnected')
+    delete players[socket.id]
+    io.emit('playerDisconnected', socket.id)
   })
+
+  socket.on('playerMovement', function (movementData) {
+    players[socket.id].x = movementData.x
+    players[socket.id].y = movementData.y
+    players[socket.id].rotation = movementData.rotation
+
+    socket.broadcast.emit('playerMoved', players[socket.id])
+  })
+})
+
+function getRandomColor() {
+  return '0x' + Math.floor(Math.random() * 16777215).toString(16)
+}
