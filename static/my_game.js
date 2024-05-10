@@ -63,6 +63,8 @@ function create()
 	this.player = this.physics.add.sprite(400, 960, 'player', 'idle_down_1.png');
 	const buildingLayer = this.map.createLayer('Building', cityTiles);
 	const treesLayer = this.map.createLayer('Trees', cityTiles);
+
+	// add collision to layers based on 'collides' property
 	borderLayer.setCollisionByProperty({ collides: true });
 	objectsLayer.setCollisionByProperty({ collides: true });
 	buildingLayer.setCollisionByProperty({ collides: true });
