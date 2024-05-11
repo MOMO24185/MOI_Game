@@ -61,6 +61,7 @@ function create()
 	const borderLayer = this.map.createLayer('Border', cityTiles);
 	const objectsLayer = this.map.createLayer('Objects', cityTiles);
 	this.player = this.physics.add.sprite(400, 960, 'player', 'idle_down_1.png');
+	this.player.setBodySize(10, 10);
 	const buildingLayer = this.map.createLayer('Building', cityTiles);
 	const treesLayer = this.map.createLayer('Trees', cityTiles);
 
@@ -78,7 +79,10 @@ function create()
 
 	this.player.setCollideWorldBounds(true);
 
-	this.physics.add.collider(this.player, borderLayer, objectsLayer, buildingLayer, treesLayer);
+	this.physics.add.collider(this.player, borderLayer);
+	this.physics.add.collider(this.player, objectsLayer);
+	this.physics.add.collider(this.player, buildingLayer);
+	this.physics.add.collider(this.player, treesLayer);
 
 	this.cameras.main.startFollow(this.player);
 
