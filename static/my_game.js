@@ -19,9 +19,54 @@ var config = {
     }
 }
 
-speed = 50;
+var moneyText;
+var speed = 50;
+var game = new Phaser.Game(config);
 
-var game = new Phaser.Game(config)
+// Money functions
+function earnMoney(amount) {
+	money += amount;
+	moneyText.setText('Money: ' + money);
+	saveMoney();
+}
+
+function spendMoney(amount) {
+	if (money >= amount) {
+		money -= amount;
+		saveMoney();
+		moneyText.setText('Money: ' + money);
+		// Perform actions associated with spending money
+	} else {
+		console.log("Not enough money!");
+	}
+}
+
+// Functions to save and load money using local storage
+function saveMoney() {
+	localStorage.setItem('money', money);
+}
+
+function loadMoney() {
+	var savedMoney = localStorage.getItem('money');
+	if (savedMoney !== null)
+		money = parseInt(savedMoney);
+	else if (savedMoney == null)
+		money = 0;
+	moneyText.setText('Money: ' + money);
+}
+
+function saveCar() {
+	localStorage.setItem('carStatus', carStatus);
+}
+
+function loadCar() {
+	var savedCar = localStorage.getItem('carStatus');
+	if (savedCar !== null)
+		carStatus = parseInt(savedMoney);
+	else if (savedCar == null)
+		savedCar = 0;
+	moneyText.setText('Money: ' + money);
+}
 
 function preload()
 {
@@ -33,15 +78,21 @@ function preload()
 	this.load.image('Objects', 'static/assets/Tilesets/Tiles.png');
 	this.load.image('Trees', 'static/assets/Tilesets/Tree-Sheet.png');
 	// Load car sprite
-	this.load.image('car', 'static/assets/Sprites/car.png');
+	this.load.image('car', 'static/assets/Sprites/car2.png');
 	// Load tilemap
 	this.load.tilemapTiledJSON('city', 'static/assets/Tilemaps/map.json');
 	// Load player sprite sheet
 	this.load.atlas('player', 'static/assets/Sprites/character/character.png', 'static/assets/Sprites/character/character.json');
 }
 
+function interactWithCar(player, car) {
+    // Perform actions when collision occurs
+}
+
 function create()
 {
+	// Set up users money
+	var money = 0;
 	// Make tilemap
 	this.map = this.make.tilemap({ key: 'city' })
 	// add Tilesets to map
@@ -60,8 +111,13 @@ function create()
 	this.map.createLayer('Floor', cityTiles);
 	const borderLayer = this.map.createLayer('Border', cityTiles);
 	const objectsLayer = this.map.createLayer('Objects', cityTiles);
+	//Adding player sprite
 	this.player = this.physics.add.sprite(400, 960, 'player', 'idle_down_1.png');
 	this.player.setBodySize(10, 10);
+	//Adding car sprite
+	this.car = this.physics.add.sprite(400, 800, 'car');
+	this.car.setScale(0.23);
+	this.car.setBodySize(120, 260);
 	const buildingLayer = this.map.createLayer('Building', cityTiles);
 	const treesLayer = this.map.createLayer('Trees', cityTiles);
 
@@ -77,18 +133,33 @@ function create()
 
 	this.cursors = this.input.keyboard.createCursorKeys();
 
-	this.player.setCollideWorldBounds(true);
+	//Adding car collision
+	this.car.setCollideWorldBounds(true);
+	this.physics.add.collider(this.car, borderLayer);
+	this.physics.add.collider(this.car, objectsLayer);
+	this.physics.add.collider(this.car, buildingLayer);
+	this.physics.add.collider(this.car, treesLayer);
+	this.car.body.setImmovable(true);
+	this.physics.add.collider(this.car, this.player, interactWithCar, null, this);
 
+	//Adding player collision
+	this.player.setCollideWorldBounds(true);
 	this.physics.add.collider(this.player, borderLayer);
 	this.physics.add.collider(this.player, objectsLayer);
 	this.physics.add.collider(this.player, buildingLayer);
 	this.physics.add.collider(this.player, treesLayer);
 
-	this.cameras.main.startFollow(this.player);
+	this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
 
 	this.cameras.main.followOffset.set(0, 0);
-	
-	//Setting up character sprite
+	//Loading money
+	moneyText = this.add.text(10, 10, 'Money: ' + money, {
+		fontSize: '24px',
+		fill: '#000',
+		wordWrap: { width: 200, useAdvancedWrap: true }
+	});
+	loadMoney();
+	loadCar();
 
 	//Preparing character animations
 	//Idle anims
@@ -152,6 +223,10 @@ function create()
 
 function update()
 {
+	//Offset money UI with camera positioning
+	moneyText.x = this.cameras.main.scrollX + 10;
+    moneyText.y = this.cameras.main.scrollY + 10;
+	//Prepare for player movement
 	this.player.setVelocity(0);
 	if (!this.player || !this.cursors)
 			return;
