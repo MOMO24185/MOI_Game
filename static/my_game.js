@@ -19,7 +19,7 @@ var config = {
     }
 }
 
-speed = 50;
+speed = 300;
 
 var game = new Phaser.Game(config)
 
@@ -38,6 +38,8 @@ function preload()
 	this.load.tilemapTiledJSON('city', 'static/assets/Tilemaps/map.json');
 	// Load player sprite sheet
 	this.load.atlas('player', 'static/assets/Sprites/character/character.png', 'static/assets/Sprites/character/character.json');
+	// Load welcome message
+	this.load.atlas('welcomeMessage', 'static/assets/Tilesets/Text/welcome.png', 'static/assets/Tilesets/Text/welcome.json');
 }
 
 function create()
@@ -53,6 +55,7 @@ function create()
 	const Trees = this.map.addTilesetImage('Trees', 'Trees')
 
 	this.player = this.textures.get('player')
+	this.welcomeMessage = this.textures.get('welcomeMessage')
 
 	// add Tilesets to map layers
 	const cityTiles = [city, Objects, buildings, FireStation, PoliceStation, Trees];
@@ -62,6 +65,8 @@ function create()
 	const objectsLayer = this.map.createLayer('Objects', cityTiles);
 	this.player = this.physics.add.sprite(400, 960, 'player', 'idle_down_1.png');
 	this.player.setBodySize(10, 10);
+	this.welcomeMessage = this.add.sprite(400 + 35, 960 - 40, 'welcomeMessage', 'welcome1.png');
+	this.welcomeMessage.setScale(0.3);
 	const buildingLayer = this.map.createLayer('Building', cityTiles);
 	const treesLayer = this.map.createLayer('Trees', cityTiles);
 
@@ -88,8 +93,18 @@ function create()
 
 	this.cameras.main.followOffset.set(0, 0);
 	
-	//Setting up character sprite
+	
+	// Create welcome message animation
+	this.welcomeMessage.anims.create({
+		key: 'welcomeMessage',
+		frames: this.anims.generateFrameNames('welcomeMessage', {start: 1, end: 38, prefix: 'welcome', suffix: '.png'}),
+		repeat: 0,
+		frameRate: 10
+	});
 
+	this.welcomeMessage.anims.play('welcomeMessage', true);
+	//Setting up character sprite
+	
 	//Preparing character animations
 	//Idle anims
 	this.player.anims.create({
@@ -112,14 +127,14 @@ function create()
 		repeat: -1,
 		frameRate: 10
 	});
-
+	
 	this.player.anims.create({
 		key: 'player-idle-right',
 		frames: this.anims.generateFrameNames('player', {start: 1, end: 4, prefix: 'idle_right_', suffix: '.png'}),
 		repeat: -1,
 		frameRate: 10
 	});
-
+	
 	//Running anims
 	this.player.anims.create({
 		key: 'player-run-down',
@@ -127,21 +142,21 @@ function create()
 		repeat: -1,
 		frameRate: 15
 	});
-
+	
 	this.player.anims.create({
 		key: 'player-run-up',
 		frames: this.anims.generateFrameNames('player', {start: 1, end: 8, prefix: 'run_up_', suffix: '.png'}),
 		repeat: -1,
 		frameRate: 15
 	});
-
+	
 	this.player.anims.create({
 		key: 'player-run-left',
 		frames: this.anims.generateFrameNames('player', {start: 1, end: 8, prefix: 'run_left_', suffix: '.png'}),
 		repeat: -1,
 		frameRate: 15
 	});
-
+	
 	this.player.anims.create({
 		key: 'player-run-right',
 		frames: this.anims.generateFrameNames('player', {start: 1, end: 8, prefix: 'run_right_', suffix: '.png'}),
@@ -152,61 +167,63 @@ function create()
 
 function update()
 {
+	this.welcomeMessage.x = this.player.x + 35;
+	this.welcomeMessage.y = this.player.y - 40;
 	this.player.setVelocity(0);
 	if (!this.player || !this.cursors)
-			return;
+		return;
 	if (this.cursors.left.isDown)
-	{
-		this.player.anims.play('player-run-left', true);
-		this.player.setVelocity(-speed, 0)
-	}
-	else if (this.cursors.right.isDown)
-	{
-		this.player.anims.play('player-run-right', true);
-		this.player.setVelocity(speed, 0)
-	}
-	else if (this.cursors.up.isDown)
-	{
-		this.player.anims.play('player-run-up', true);
-		this.player.setVelocity(0, -speed)
-	}
-	else if (this.cursors.down.isDown)
-	{
-		this.player.anims.play('player-run-down', true);
-		this.player.setVelocity(0, speed)
-	}
-	else
-	{
-		this.player.anims.play('player-idle-down', true);
-		this.player.setVelocity(0, 0)
-	}
-	//	Commented Code is for driving physics which is not availabe at the moment due to 
-	//	driving option not being implemented to the main player sprite
-	//	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-	// if ((this.cursors.up.isDown && this.cursors.right.isDown) || (this.cursors.down.isDown && this.cursors.right.isDown)) {
-	//   player.setAngularVelocity(100)
-	// } else if ((this.cursors.down.isDown && this.cursors.left.isDown) || (this.cursors.up.isDown && this.cursors.left.isDown)) {
-	//   player.setAngularVelocity(-100)
-	// } else {
-	//   player.setAngularVelocity(0)
-	// }
-
-	// const velX = Math.cos((player.angle - 360) * 0.01745)
-	// const velY = Math.sin((player.angle - 360) * 0.01745)
-	// if (this.cursors.up.isDown) {
-	//   player.setVelocityX(200 * velX)
-	//   player.setVelocityY(200 * velY)
-	// } else if (this.cursors.down.isDown) {
-	//   player.setVelocityX(-100 * velX)
-	//   player.setVelocityY(-100 * velY)
-	// } else {
-	//   player.setAcceleration(0)
-	// }
-
-	// const currPosition = {
-	//   x: player.x,
-	//   y: player.y,
-	//   rotation: player.rotation
-	// }
-	// player.oldPosition = currPosition
-}
+		{
+			this.player.anims.play('player-run-left', true);
+			this.player.setVelocity(-speed, 0)
+		}
+		else if (this.cursors.right.isDown)
+			{
+				this.player.anims.play('player-run-right', true);
+				this.player.setVelocity(speed, 0)
+			}
+			else if (this.cursors.up.isDown)
+				{
+					this.player.anims.play('player-run-up', true);
+					this.player.setVelocity(0, -speed)
+				}
+				else if (this.cursors.down.isDown)
+					{
+						this.player.anims.play('player-run-down', true);
+						this.player.setVelocity(0, speed)
+					}
+					else
+					{
+						this.player.anims.play('player-idle-down', true);
+						this.player.setVelocity(0, 0)
+					}
+					//	Commented Code is for driving physics which is not availabe at the moment due to 
+					//	driving option not being implemented to the main player sprite
+					//	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+					// if ((this.cursors.up.isDown && this.cursors.right.isDown) || (this.cursors.down.isDown && this.cursors.right.isDown)) {
+						//   player.setAngularVelocity(100)
+						// } else if ((this.cursors.down.isDown && this.cursors.left.isDown) || (this.cursors.up.isDown && this.cursors.left.isDown)) {
+							//   player.setAngularVelocity(-100)
+							// } else {
+								//   player.setAngularVelocity(0)
+								// }
+								
+								// const velX = Math.cos((player.angle - 360) * 0.01745)
+								// const velY = Math.sin((player.angle - 360) * 0.01745)
+								// if (this.cursors.up.isDown) {
+									//   player.setVelocityX(200 * velX)
+									//   player.setVelocityY(200 * velY)
+									// } else if (this.cursors.down.isDown) {
+										//   player.setVelocityX(-100 * velX)
+										//   player.setVelocityY(-100 * velY)
+										// } else {
+											//   player.setAcceleration(0)
+											// }
+											
+											// const currPosition = {
+												//   x: player.x,
+												//   y: player.y,
+												//   rotation: player.rotation
+												// }
+												// player.oldPosition = currPosition
+											}
