@@ -1,7 +1,4 @@
 import MainGameScene from '/static/GameScene.js';
-import { earnMoney, spendMoney, saveMoney, loadMoney } from '/static/moneyFunctions.js';
-import { saveCar, loadCar, interactWithCar, carMovement } from '/static/carStatus.js';
-import { playerMovement } from '/static/character.js';
 
 var config = {
     type: Phaser.AUTO,
