@@ -65,8 +65,8 @@ function create()
 	const objectsLayer = this.map.createLayer('Objects', cityTiles);
 	this.player = this.physics.add.sprite(400, 960, 'player', 'idle_down_1.png');
 	this.player.setBodySize(10, 10);
-	this.welcomeMessage = this.add.sprite(400 + 35, 960 - 40, 'welcomeMessage', 'welcome1.png');
-	this.welcomeMessage.setScale(0.3);
+	this.welcomeMessage = this.add.sprite(400 + 35, 960 - 40, 'welcomeMessage', 'welcome0.png');
+	this.welcomeMessage.setScale(0.25);
 	const buildingLayer = this.map.createLayer('Building', cityTiles);
 	const treesLayer = this.map.createLayer('Trees', cityTiles);
 
@@ -97,7 +97,7 @@ function create()
 	// Create welcome message animation
 	this.welcomeMessage.anims.create({
 		key: 'welcomeMessage',
-		frames: this.anims.generateFrameNames('welcomeMessage', {start: 1, end: 38, prefix: 'welcome', suffix: '.png'}),
+		frames: this.anims.generateFrameNames('welcomeMessage', {start: 0, end: 37, prefix: 'welcome', suffix: '.png'}),
 		repeat: 0,
 		frameRate: 10
 	});
