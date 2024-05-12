@@ -10,8 +10,10 @@ export function spendMoney(scene, amount) {
 		saveMoney();
 		scene.moneyText.setText('Money: ' + scene.money);
 		// Perform actions associated with spending money
+		return true;
 	} else {
 		console.log("Not enough money!");
+		return false;
 	}
 }
 
@@ -23,7 +25,7 @@ export function loadMoney(scene) {
 	var savedMoney = localStorage.getItem('money');
 	if (savedMoney !== null)
 		scene.money = parseInt(savedMoney);
-	else if (savedMoney == null)
+	else
 		scene.money = 0;
 	scene.moneyText.setText('Money: ' + scene.money);
 }

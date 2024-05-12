@@ -1,4 +1,20 @@
+import { loadMoney, earnMoney, spendMoney, saveMoney } from "/static/moneyFunctions.js";
+import { enterCarDialog, buyCarDialog } from "/static/dialogs.js";
+
 let carStatus;
+
+export function handleBuyCar(scene){
+	if (spendMoney(scene, 2000))
+	{
+		scene.carStatus = true;
+		saveCar();
+		console.log('Bought car');
+	}
+}
+
+export function handleEnterCar(){
+	
+}
 
 export function saveCar() {
 	localStorage.setItem('carStatus', carStatus);
@@ -7,14 +23,44 @@ export function saveCar() {
 export function loadCar(scene) {
 	var savedCar = localStorage.getItem('carStatus');
 	if (savedCar !== null)
-		scene.carStatus = parseInt(savedMoney);
-	else if (savedCar == null)
-		savedCar = 0;
+	{
+		if (savedCar == true)
+			scene.carStatus = true;
+	}
+	else
+		savedCar = false;
+	saveCar();
 	scene.moneyText.setText('Money: ' + scene.money);
 }
 
-export function interactWithCar(scene, player, car) {
-    // Perform actions when collision occurs
+export function interactWithCar(scene) {// Check if the player owns the car
+    console.log('Player collided with the car');
+    if (scene.carStatus) {
+        console.log('Player owns the car.');
+      	// Display a popup with options to enter the car
+        // For example:
+        if (confirm('Do you want to enter the car?')) {
+            // Player wants to enter the car, implement logic to enter the car
+            console.log('Player wants to enter the car. Implementing enter car logic...');
+            // Implement logic to deduct money and set carStatus to true
+        } else {
+            // Player does not want to enter the car
+            console.log('Player does not want to enter the car.');
+		}
+    } else {
+        // Player does not own the car, prompt to buy the car
+        console.log('Player does not own the car.');
+        // Display a popup with options to buy the car
+        // For example:
+        if (confirm('Do you want to buy the car?')) {
+            // Player wants to buy the car, implement logic to buy the car
+            console.log('Player wants to buy the car. Implementing buy car logic...');
+            // Implement logic to deduct money and set carStatus to true
+        } else {
+            // Player does not want to buy the car
+            console.log('Player does not want to buy the car.');
+        }
+    }
 }
 
 export function carMovement(scene)
