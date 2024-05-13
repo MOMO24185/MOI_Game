@@ -41,7 +41,7 @@ export function interactWithCar(scene) {// Check if the player owns the car
         console.log('Player owns the car.');
       	// Display a popup with options to enter the car
         // For example:
-        if (confirm('Do you want to enter the car?')) {
+        if (enterCarDialog(scene)) {
             // Player wants to enter the car, implement logic to enter the car
             console.log('Player wants to enter the car. Implementing enter car logic...');
             // Implement logic to deduct money and set carStatus to true
@@ -55,7 +55,7 @@ export function interactWithCar(scene) {// Check if the player owns the car
         console.log('Player does not own the car.');
         // Display a popup with options to buy the car
         // For example:
-        if (confirm('Do you want to buy the car?')) {
+        if (buyCarDialog(scene)) {
             // Player wants to buy the car, implement logic to buy the car
             console.log('Player wants to buy the car. Implementing buy car logic...');
             // Implement logic to deduct money and set carStatus to true

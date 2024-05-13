@@ -12,7 +12,7 @@ var config = {
 			debug: true
         }
     },
-	scene: [MainGameScene],
+	scene: [ MainGameScene ],
     scale: {
         parent: 'yourgamediv',
         mode: Phaser.Scale.FIT,

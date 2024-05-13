@@ -1,15 +1,17 @@
 import { loadCharacterAnims, playerMovement } from "/static/character.js";
 import { interactWithCar, loadCar, saveCar, carMovement } from "/static/carStatus.js";
 import { loadMoney, earnMoney, spendMoney, saveMoney } from "/static/moneyFunctions.js";
+import PopUpScene from "/static/pop_up.js";
 
 class MainGameScene extends Phaser.Scene {
 	constructor() {
-		super({ key: 'MainGameScene' });
+		super({ key: 'MainGameScene',
+		transparent: true });
 	}
 	
 	preload()
 	{
-		// Load images
+		// Load Images
 		this.load.image('buildings', 'static/assets/Tilesets/Buildings-Sheet.png');
 		this.load.image('city', 'static/assets/Tilesets/Road-Sheet.png');
 		this.load.image('FireStation', 'static/assets/Tilesets/FireStation.png');
@@ -30,13 +32,17 @@ class MainGameScene extends Phaser.Scene {
 
     create()
 	{
-		this.speed = 50;
+		this.speed = 150;
 		this.confirmationDialogOpened = false;
 		this.collisionCooldown = false;
 		// Set up users money
 		this.money = 0;
 		// Make tilemap
 		this.map = this.make.tilemap({ key: 'city' })
+		// Load UI elements outside of visible range
+		this.dialogBox = this.add.image(-1000, -1000, 'dialogBox');
+		this.button = this.add.image(-1000, -1000, 'button');
+		this.buttonPress = this.add.image(-1000, -1000, 'buttonPress');
 		// add Tilesets to map
 		const buildings = this.map.addTilesetImage('buildings', 'buildings')
 		const city = this.map.addTilesetImage('city', 'city')
@@ -54,7 +60,7 @@ class MainGameScene extends Phaser.Scene {
 		const borderLayer = this.map.createLayer('Border', cityTiles);
 		const objectsLayer = this.map.createLayer('Objects', cityTiles);
 		//Adding player sprite
-		this.player = this.physics.add.sprite(400, 960, 'player', 'idle_down_1.png');
+		this.player = this.physics.add.sprite(400, 965, 'player', 'idle_down_1.png');
 		this.player.setBodySize(10, 10);
 		//Adding car sprite
 		this.car = this.physics.add.sprite(400, 800, 'car');
@@ -82,7 +88,6 @@ class MainGameScene extends Phaser.Scene {
 		this.physics.add.collider(this.car, buildingLayer);
 		this.physics.add.collider(this.car, treesLayer);
 		this.car.body.setImmovable(true);
-		this.physics.add.collider(this.car, this.player, interactWithCar, null, this);
 
 		//Adding player collision
 		this.player.setCollideWorldBounds(true);
@@ -106,11 +111,27 @@ class MainGameScene extends Phaser.Scene {
 		//Preparing character animations
 		//Idle anims
 		loadCharacterAnims(this);
+		// Preparing car and player collision for interactions
+		this.physics.add.collider(this.car, this.player, interactWithCar, null, this);
+		this.showOverlay();
 	}
+
+	showOverlay() {
+        // Create an instance of OverlayScene
+		const popUpScene = new PopUpScene();
+
+		// Add the overlay scene to the game
+		this.scene.add('PopUpScene', popUpScene);
+
+		// Bring the overlay scene to the top to render it over the main game scene
+		this.scene.launch('PopUpScene');
+    }
 
     update() 
 	{
 		//Offset money UI with camera positioning
+		this.camX = this.cameras.main.scrollX;
+		this.camY = this.cameras.main.scrollY;
 		this.moneyText.x = this.cameras.main.scrollX + 10;
 		this.moneyText.y = this.cameras.main.scrollY + 10;
 		playerMovement(this);
