@@ -10,6 +10,13 @@ function closeDialog() {
     noButton.destroy();
 }
 
+export function startCollisionCooldown(scene) {
+    scene.collisionCooldown = true;
+    setTimeout(() => {
+        scene.collisionCooldown = false; // Reset collision cooldown after a certain period
+    }, 1000); // Adjust the cooldown period as needed (in milliseconds)
+}
+
 export function enterCarDialog(scene) {
     // Create a modal or dialog with Phaser's graphics/text features
     const dialog = scene.add.graphics();

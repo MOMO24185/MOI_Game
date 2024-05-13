@@ -31,6 +31,8 @@ class MainGameScene extends Phaser.Scene {
     create()
 	{
 		this.speed = 50;
+		this.confirmationDialogOpened = false;
+		this.collisionCooldown = false;
 		// Set up users money
 		this.money = 0;
 		// Make tilemap

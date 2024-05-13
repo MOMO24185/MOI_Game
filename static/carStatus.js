@@ -1,5 +1,5 @@
 import { loadMoney, earnMoney, spendMoney, saveMoney } from "/static/moneyFunctions.js";
-import { enterCarDialog, buyCarDialog } from "/static/dialogs.js";
+import { enterCarDialog, buyCarDialog, startCollisionCooldown } from "/static/dialogs.js";
 
 let carStatus;
 
@@ -35,7 +35,9 @@ export function loadCar(scene) {
 
 export function interactWithCar(scene) {// Check if the player owns the car
     console.log('Player collided with the car');
-    if (scene.carStatus) {
+    if (scene.carStatus && !scene.confirmationDialogOpened && !scene.collisionCooldown) {
+		startCollisionCooldown(scene);
+		scene.confirmationDialogOpened = true;
         console.log('Player owns the car.');
       	// Display a popup with options to enter the car
         // For example:
@@ -47,7 +49,8 @@ export function interactWithCar(scene) {// Check if the player owns the car
             // Player does not want to enter the car
             console.log('Player does not want to enter the car.');
 		}
-    } else {
+    } else if (!scene.carStatus && !scene.confirmationDialogOpened && !scene.collisionCooldown) {
+		scene.confirmationDialogOpened = true;
         // Player does not own the car, prompt to buy the car
         console.log('Player does not own the car.');
         // Display a popup with options to buy the car
