@@ -19,6 +19,10 @@ var config = {
     }
 }
 
+var	interacting = false;
+var	interactionArea;
+var	interactionButton;
+
 speed = 300;
 
 var game = new Phaser.Game(config)
@@ -40,6 +44,15 @@ function preload()
 	this.load.atlas('player', 'static/assets/Sprites/character/character.png', 'static/assets/Sprites/character/character.json');
 	// Load welcome message
 	this.load.atlas('welcomeMessage', 'static/assets/Tilesets/Text/welcome.png', 'static/assets/Tilesets/Text/welcome.json');
+
+	// Define interaction areas
+	interactionArea = this.add.rectangle(600, 310, 50, 50, 0xff0000); // 50x50 interaction area at police station entrance
+	this.physics.add.existing(interactionArea, true); // Enable physics for collision detection
+	
+	// Define interaction button
+	interactionButton = this.add.text(400, 400, 'Interact', { fontFamily: 'Arial', fontSize: '24px', fill: '#ffffff' });
+	interactionButton.setInteractive();
+	interactionButton.on('spacedown', interact, this); // Set up event listener for button press
 }
 
 function create()
@@ -66,7 +79,7 @@ function create()
 	this.player = this.physics.add.sprite(400, 960, 'player', 'idle_down_1.png');
 	this.player.setBodySize(10, 10);
 	this.welcomeMessage = this.add.sprite(400 + 35, 960 - 40, 'welcomeMessage', 'welcome0.png');
-	this.welcomeMessage.setScale(0.25);
+	this.welcomeMessage.setScale(0.30);
 	const buildingLayer = this.map.createLayer('Building', cityTiles);
 	const treesLayer = this.map.createLayer('Trees', cityTiles);
 
@@ -81,6 +94,10 @@ function create()
 	this.physics.world.setBounds(0, 0, 1400, 1150);
 
 	this.cursors = this.input.keyboard.createCursorKeys();
+	// Create spacebar key
+	this.spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+	
+	this.spacebar.on('down', interact, this);
 
 	this.player.setCollideWorldBounds(true);
 
@@ -92,8 +109,7 @@ function create()
 	this.cameras.main.startFollow(this.player);
 
 	this.cameras.main.followOffset.set(0, 0);
-	
-	
+
 	// Create welcome message animation
 	this.welcomeMessage.anims.create({
 		key: 'welcomeMessage',
@@ -197,6 +213,17 @@ function update()
 						this.player.anims.play('player-idle-down', true);
 						this.player.setVelocity(0, 0)
 					}
+	// console.log("Interaction area = " + interactionArea.getBounds().x + " " + interactionArea.getBounds().y + " Player = " + this.player.x + " " + this.player.y);
+	// if (interacting === false && Phaser.Geom.Rectangle.ContainsPoint(interactionArea.getBounds(), this.player.x, this.player.y)) {
+		// if (interacting === false && player.x >= interactionArea.x && player.x <= interactionArea.x + 50 && player.y >= interactionArea.y && player.y <= interactionArea.y + 50) {
+    //     // If player is inside interaction area and not currently interacting, show button
+    //     interactionButton.visible = true;
+	// 	console.log("I am here!");
+	// 	// this.spacebar.on('down', interact, this);
+    // } else {
+	// 	// Otherwise, hide button
+    //     interactionButton.visible = false;
+    // }
 					//	Commented Code is for driving physics which is not availabe at the moment due to 
 					//	driving option not being implemented to the main player sprite
 					//	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -227,3 +254,26 @@ function update()
 												// }
 												// player.oldPosition = currPosition
 											}
+
+function	interact()
+{
+	console.log("Interacting");
+	// console.log("Interaction area = " + interactionArea.getBounds().x + " " + interactionArea.getBounds().y + " Player = " + this.player.x + " " + this.player.y);
+
+	// Check for interaction with police station
+	if (interacting === false && this.player.x >= interactionArea.getBounds().x && this.player.x <= interactionArea.getBounds().x + 50 && this.player.y >= interactionArea.getBounds().y && this.player.y <= interactionArea.getBounds().y + 50) {
+		// If player is inside interaction area and not currently interacting, show button
+		interactionButton.visible = true;
+		policeStationInteract(this);
+	} else {
+		// Otherwise, hide button and do nothing
+		interactionButton.visible = false;
+		console.log("Not interacting with police station!");
+	}
+}
+
+function	policeStationInteract()
+{
+	console.log("Interacting with police station!");
+	// Put interaction with police station code here
+}
