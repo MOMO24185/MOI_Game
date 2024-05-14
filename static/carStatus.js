@@ -1,8 +1,6 @@
 import { loadMoney, earnMoney, spendMoney, saveMoney } from "/static/moneyFunctions.js";
 import { enterCarDialog, buyCarDialog, startCollisionCooldown } from "/static/dialogs.js";
 
-let carStatus;
-
 export function handleBuyCar(scene){
 	if (spendMoney(scene, 2000))
 	{
@@ -16,32 +14,36 @@ export function handleEnterCar(){
 	
 }
 
-export function saveCar() {
-	localStorage.setItem('carStatus', carStatus);
+export function saveCar(scene) {
+	localStorage.setItem('carStatus', scene.carStatus);
 }
 
 export function loadCar(scene) {
 	var savedCar = localStorage.getItem('carStatus');
+	console.log(scene.carStatus);
 	if (savedCar !== null)
 	{
-		if (savedCar == true)
-			scene.carStatus = true;
+		savedCar = parseInt(savedCar);
+		if (savedCar == 1)
+			scene.carStatus = 1;
+		else
+			scene.carStatus = 0;
 	}
 	else
-		savedCar = false;
-	saveCar();
-	scene.moneyText.setText('Money: ' + scene.money);
+		scene.carStatus = 0;
+	saveCar(scene);
 }
 
 export function interactWithCar(scene) {// Check if the player owns the car
     console.log('Player collided with the car');
-    if (scene.carStatus && !scene.confirmationDialogOpened && !scene.collisionCooldown) {
+	loadCar(scene);
+    if (scene.carStatus == 1 && !scene.confirmationDialogOpened && !scene.collisionCooldown) {
 		startCollisionCooldown(scene);
 		scene.confirmationDialogOpened = true;
         console.log('Player owns the car.');
       	// Display a popup with options to enter the car
         // For example:
-        if (enterCarDialog(scene)) {
+        if (confirm('Do you want to enter the car?')) {
             // Player wants to enter the car, implement logic to enter the car
             console.log('Player wants to enter the car. Implementing enter car logic...');
             // Implement logic to deduct money and set carStatus to true
@@ -49,13 +51,13 @@ export function interactWithCar(scene) {// Check if the player owns the car
             // Player does not want to enter the car
             console.log('Player does not want to enter the car.');
 		}
-    } else if (!scene.carStatus && !scene.confirmationDialogOpened && !scene.collisionCooldown) {
-		scene.confirmationDialogOpened = true;
+    } else if (!scene.confirmationDialogOpened && !scene.collisionCooldown) {
+		scene.confirmationDialogOpened = true; 
         // Player does not own the car, prompt to buy the car
         console.log('Player does not own the car.');
         // Display a popup with options to buy the car
         // For example:
-        if (buyCarDialog(scene)) {
+        if (confirm('Do you want to buy the car?')) {
             // Player wants to buy the car, implement logic to buy the car
             console.log('Player wants to buy the car. Implementing buy car logic...');
             // Implement logic to deduct money and set carStatus to true

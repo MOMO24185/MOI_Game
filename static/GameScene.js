@@ -6,14 +6,14 @@ import PopUpScene from "/static/pop_up.js";
 function interact(scene)
 {
 	console.log("Interacting");
-	// console.log("Interaction area = " + this.interactionArea.getBounds().x + " " + this.interactionArea.getBounds().y + " Player = " + this.player.x + " " + this.player.y);
+	console.log("Interaction area = " + this.interactionArea.getBounds().x + " " + this.interactionArea.getBounds().y + " Player = " + this.player.x + " " + this.player.y);
 	// Check for interaction with police station
-	if (scene.interacting === false && scene.player.x >= scene.interactionArea.getBounds().x &&
-	 scene.player.x <= scene.interactionArea.getBounds().x + 50 && scene.player.y >= scene.interactionArea.getBounds().y 
-	 && scene.player.y <= scene.interactionArea.getBounds().y + 50) {
+	if (this.player.x >= this.interactionArea.getBounds().x &&
+	 this.player.x <= this.interactionArea.getBounds().x + 50 && this.player.y >= this.interactionArea.getBounds().y 
+	 && this.player.y <= this.interactionArea.getBounds().y + 50) {
 		// If player is inside interaction area and not currently this.interacting, show button
-		scene.interactionButton.visible = true;
-		policeStationInteract(scene);
+		this.interactionButton.visible = true;
+		policeStationInteract(this);
 	} else {
 		// Otherwise, hide button and do nothing
 		// this.interactionButton.visible = false;
@@ -35,7 +35,6 @@ class MainGameScene extends Phaser.Scene {
 	
 	preload()
 	{
-		this.interacting = false;
 		// Load Images
 		this.load.image('buildings', 'static/assets/Tilesets/Buildings-Sheet.png');
 		this.load.image('city', 'static/assets/Tilesets/Road-Sheet.png');
@@ -55,14 +54,16 @@ class MainGameScene extends Phaser.Scene {
 		this.load.atlas('player', 'static/assets/Sprites/character/character.png', 'static/assets/Sprites/character/character.json');
 		// Load welcome message
 		this.load.atlas('welcomeMessage', 'static/assets/Tilesets/Text/welcome.png', 'static/assets/Tilesets/Text/welcome.json');
+		
+		// Define interaction areas
+		this.interacting = false;
+		this.interactionArea = this.add.rectangle(600, 310, 50, 50, 0xff0000); // 50x50 interaction area at police station entrance
+		this.physics.add.existing(this.interactionArea, true); // Enable physics for collision detection
 	}
 
     create()
-	{
-		// Define interaction areas
-		this.interactionArea = this.add.rectangle(600, 310, 50, 50, 0xff0000); // 50x50 interaction area at police station entrance
-		this.physics.add.existing(this.interactionArea, true); // Enable physics for collision detection
-		// Define Speed
+	{// Define Speed
+		this.carStatus = 0;
 		this.speed = 150;
 		this.confirmationDialogOpened = false;
 		this.collisionCooldown = false;
