@@ -1,12 +1,22 @@
 import { loadCharacterAnims, playerMovement } from "/static/character.js";
-import { interactWithCar, loadCar, saveCar, carMovement } from "/static/carStatus.js";
+import { interactWithCar, loadCar, saveCar, carMovement, handleExitCar } from "/static/carStatus.js";
 import { loadMoney, earnMoney, spendMoney, saveMoney } from "/static/moneyFunctions.js";
 import PopUpScene from "/static/pop_up.js";
 
 function interact(scene)
 {
 	console.log("Interacting");
-	console.log("Interaction area = " + this.interactionArea.getBounds().x + " " + this.interactionArea.getBounds().y + " Player = " + this.player.x + " " + this.player.y);
+	// console.log("Interaction area = " + this.interactionArea.getBounds().x + " " + this.interactionArea.getBounds().y + " Player = " + this.player.x + " " + this.player.y);
+	console.log("Player is inside car? " + this.player.insideCar);
+	
+	// Check if player is inside car
+	if (this.player.insideCar == true)
+		{
+			// If player is inside car, exit car
+			this.player.insideCar = false;
+			handleExitCar(this);
+		}
+		
 	// Check for interaction with police station
 	if (this.player.x >= this.interactionArea.getBounds().x &&
 	 this.player.x <= this.interactionArea.getBounds().x + 50 && this.player.y >= this.interactionArea.getBounds().y 
@@ -16,10 +26,11 @@ function interact(scene)
 		policeStationInteract(this);
 	} else {
 		// Otherwise, hide button and do nothing
-		// this.interactionButton.visible = false;
-		console.log("Not interacting with police station!");
+		this.interactionButton.visible = false;
+		// console.log("Not interacting with police station!");
 	}
 }
+
 function policeStationInteract(scene)
 {
 	console.log("Interacting with police station!");
@@ -62,7 +73,8 @@ class MainGameScene extends Phaser.Scene {
 	}
 
     create()
-	{// Define Speed
+	{
+		// Define Speed
 		this.carStatus = 0;
 		this.speed = 150;
 		this.confirmationDialogOpened = false;
@@ -95,6 +107,7 @@ class MainGameScene extends Phaser.Scene {
 		//Adding player sprite
 		this.player = this.physics.add.sprite(400, 965, 'player', 'idle_down_1.png');
 		this.player.setBodySize(10, 10);
+		this.player.insideCar = false;
 		//Adding car sprite
 		this.car = this.physics.add.sprite(400, 800, 'car');
 		this.car.setScale(0.23);
@@ -189,7 +202,14 @@ class MainGameScene extends Phaser.Scene {
 		this.welcomeMessage.y = this.player.y - 40;
 		this.moneyText.x = this.cameras.main.scrollX + 10;
 		this.moneyText.y = this.cameras.main.scrollY + 10;
-		playerMovement(this);
+		if (this.player.insideCar == false)
+		{
+			playerMovement(this);
+		}
+		else
+		{
+			carMovement(this);
+		}
     }
 }
 

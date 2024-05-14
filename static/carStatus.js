@@ -10,8 +10,42 @@ export function handleBuyCar(scene){
 	}
 }
 
-export function handleEnterCar(){
+export function handleEnterCar(scene)
+{
+	// Set player to invisible when he enters the car
+	scene.player.setVisible(false);
 	
+	// Set insideCar to true
+	scene.player.insideCar = true;
+
+	// Stop car movement
+	scene.car.setVelocityX(0);
+	scene.car.setVelocityY(0);
+	scene.car.setAcceleration(0);
+	scene.car.setAngularVelocity(0);
+	
+	// Make camera follow the car
+	scene.cameras.main.startFollow(scene.car);
+	scene.cameras.main.followOffset.set(0, 0);
+
+	console.log("handleEnterCar");
+}
+
+export function handleExitCar(scene)
+{
+	// Set player position to the car position
+	scene.player.x = scene.car.x;
+	scene.player.y = scene.car.y;
+
+	// Set player to visible when he exits the car
+	scene.player.setVisible(true);
+
+	// Set insideCar to false
+	scene.player.insideCar = false;
+
+	// Make camera follow the player
+	scene.cameras.main.startFollow(scene.player);
+	scene.cameras.main.followOffset.set(0, 0);
 }
 
 export function saveCar(scene) {
@@ -46,6 +80,7 @@ export function interactWithCar(scene) {// Check if the player owns the car
         if (confirm('Do you want to enter the car?')) {
             // Player wants to enter the car, implement logic to enter the car
             console.log('Player wants to enter the car. Implementing enter car logic...');
+			handleEnterCar(scene);
             // Implement logic to deduct money and set carStatus to true
         } else {
             // Player does not want to enter the car
@@ -60,6 +95,10 @@ export function interactWithCar(scene) {// Check if the player owns the car
         if (confirm('Do you want to buy the car?')) {
             // Player wants to buy the car, implement logic to buy the car
             console.log('Player wants to buy the car. Implementing buy car logic...');
+			handleBuyCar(this);
+			// Testing handleEnterCar
+			handleEnterCar(this);
+
             // Implement logic to deduct money and set carStatus to true
         } else {
             // Player does not want to buy the car
@@ -71,29 +110,29 @@ export function interactWithCar(scene) {// Check if the player owns the car
 export function carMovement(scene)
 {
 	if ((scene.cursors.up.isDown && scene.cursors.right.isDown) || (scene.cursors.down.isDown && scene.cursors.right.isDown)) {
-		scene.player.setAngularVelocity(100)
+		scene.car.setAngularVelocity(100)
 	} else if ((scene.cursors.down.isDown && scene.cursors.left.isDown) || (scene.cursors.up.isDown && scene.cursors.left.isDown)) {
-		scene.player.setAngularVelocity(-100)
+		scene.car.setAngularVelocity(-100)
 	} else {
-		scene.player.setAngularVelocity(0)
+		scene.car.setAngularVelocity(0)
 	}
   
-	const velX = Math.cos((player.angle - 360) * 0.01745)
-	const velY = Math.sin((player.angle - 360) * 0.01745)
+	const velX = Math.cos(scene.car.angle - 360 * 0.01745)
+	const velY = Math.sin(scene.car.angle - 360 * 0.01745)
 	if (scene.cursors.up.isDown) {
-		scene.player.setVelocityX(200 * velX)
-		scene.player.setVelocityY(200 * velY)
+		scene.car.setVelocityX(200 * velX)
+		scene.car.setVelocityY(200 * velY)
 	} else if (scene.cursors.down.isDown) {
-		scene.player.setVelocityX(-100 * velX)
-		scene.player.setVelocityY(-100 * velY)
+		scene.car.setVelocityX(-100 * velX)
+		scene.car.setVelocityY(-100 * velY)
 	} else {
-		scene.player.setAcceleration(0)
+		scene.car.setAcceleration(0)
 	}
   
 	const currPosition = {
-		x: scene.player.x,
-		y: scene.player.y,
-		rotation: scene.player.rotation
+		x: scene.car.x,
+		y: scene.car.y,
+		rotation: scene.car.rotation
 	}
-	scene.player.oldPosition = currPosition
+	scene.car.oldPosition = currPosition
 }
