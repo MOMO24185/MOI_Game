@@ -1,6 +1,5 @@
 import { loadMoney, earnMoney, spendMoney, saveMoney } from "/static/moneyFunctions.js";
 import { interactWithCar, loadCar, saveCar, carMovement, handleBuyCar, handleEnterCar } from "/static/carStatus.js";
-import PopUpScene from "/static/pop_up.js";
 
 function closeDialog() {
     // Remove the dialog from the scene

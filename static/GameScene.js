@@ -1,31 +1,7 @@
 import { loadCharacterAnims, playerMovement } from "/static/character.js";
 import { interactWithCar, loadCar, saveCar, carMovement } from "/static/carStatus.js";
 import { loadMoney, earnMoney, spendMoney, saveMoney } from "/static/moneyFunctions.js";
-import PopUpScene from "/static/pop_up.js";
-
-function interact(scene)
-{
-	console.log("Interacting");
-	console.log("Interaction area = " + this.interactionArea.getBounds().x + " " + this.interactionArea.getBounds().y + " Player = " + this.player.x + " " + this.player.y);
-	// Check for interaction with police station
-	if (this.player.x >= this.interactionArea.getBounds().x &&
-	 this.player.x <= this.interactionArea.getBounds().x + 50 && this.player.y >= this.interactionArea.getBounds().y 
-	 && this.player.y <= this.interactionArea.getBounds().y + 50) {
-		// If player is inside interaction area and not currently this.interacting, show button
-		this.interactionButton.visible = true;
-		policeStationInteract(this);
-	} else {
-		// Otherwise, hide button and do nothing
-		// this.interactionButton.visible = false;
-		console.log("Not interacting with police station!");
-	}
-}
-function policeStationInteract(scene)
-{
-	console.log("Interacting with police station!");
-	// Put interaction with police station code here
-	scene.showOverlay();
-}
+import servicesPopUpScene from "/static/servicesPopUp.js";
 
 class MainGameScene extends Phaser.Scene {
 	constructor() {
@@ -171,13 +147,13 @@ class MainGameScene extends Phaser.Scene {
 
 	showOverlay() {
         // Create an instance of OverlayScene
-		const popUpScene = new PopUpScene();
+		const services = new servicesPopUpScene();
 
 		// Add the overlay scene to the game
-		this.scene.add('PopUpScene', popUpScene);
+		this.scene.add('servicesPopUpScene', services);
 
 		// Bring the overlay scene to the top to render it over the main game scene
-		this.scene.launch('PopUpScene');
+		this.scene.launch('servicesPopUpScene');
     }
 
     update() 
@@ -191,6 +167,30 @@ class MainGameScene extends Phaser.Scene {
 		this.moneyText.y = this.cameras.main.scrollY + 10;
 		playerMovement(this);
     }
+}
+
+function interact(scene)
+{
+	console.log("Interacting");
+	console.log("Interaction area = " + this.interactionArea.getBounds().x + " " + this.interactionArea.getBounds().y + " Player = " + this.player.x + " " + this.player.y);
+	// Check for interaction with police station
+	if (this.player.x >= this.interactionArea.getBounds().x &&
+	 this.player.x <= this.interactionArea.getBounds().x + 50 && this.player.y >= this.interactionArea.getBounds().y 
+	 && this.player.y <= this.interactionArea.getBounds().y + 50) {
+		// If player is inside interaction area and not currently this.interacting, show button
+		this.interactionButton.visible = true;
+		policeStationInteract(this);
+	} else {
+		// Otherwise, hide button and do nothing
+		// this.interactionButton.visible = false;
+		console.log("Not interacting with police station!");
+	}
+}
+function policeStationInteract(scene)
+{
+	console.log("Interacting with police station!");
+	// Put interaction with police station code here
+	scene.showOverlay();
 }
 
 export default MainGameScene;
