@@ -4,12 +4,11 @@ export function earnMoney(scene, amount) {
     saveMoney(scene.money);
 }
 
-export function spendMoney(scene, amount) {
-	if (scene.money >= amount) {
-		scene.money -= amount;
-		saveMoney(scene.money);
-		scene.moneyText.setText('Money: ' + scene.money);
-		// Perform actions associated with spending money
+export function spendMoney(amount) {
+	var money = loadMoney();
+	if (money >= amount) {
+		money -= amount;
+		saveMoney(money);
 		return true;
 	} else {
 		console.log("Not enough money!");
@@ -21,11 +20,13 @@ export function saveMoney(money) {
 	localStorage.setItem('money', money);
 }
 
-export function loadMoney(scene) {
+export function loadMoney() {
+	var money = 0;
 	var savedMoney = localStorage.getItem('money');
 	if (savedMoney !== null)
-		scene.money = parseInt(savedMoney);
-	else
-		scene.money = 0;
-	scene.moneyText.setText('Money: ' + scene.money);
+		money = parseInt(savedMoney);
+	//Temporary since we dont have a functioning "work" tilemap
+	if (money < 2000)
+		money = 10000;
+	return money;
 }

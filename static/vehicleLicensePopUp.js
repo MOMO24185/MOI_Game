@@ -1,3 +1,6 @@
+import { addLicense } from "/static/licenseFunctions.js";
+import { spendMoney } from "/static/moneyFunctions.js";
+
 // Define an overlay scene
 export default class vehicleLicensePopUp extends Phaser.Scene {
     constructor() {
@@ -8,8 +11,8 @@ export default class vehicleLicensePopUp extends Phaser.Scene {
 	preload()
 	{
 		this.eid = false;
-		this.regist = false;
-		this.license = false;
+		this.eye = false;
+		this.nol = false;
 		// Load UI Images
 		this.load.image('dialogBox', 'static/assets/Sprites/UI_popup.png');
 		this.load.image('underText', 'static/assets/Sprites/Under_text.png');
@@ -22,7 +25,7 @@ export default class vehicleLicensePopUp extends Phaser.Scene {
         const dialogBox = this.add.image(250, 245, 'dialogBox');
 		dialogBox.setScale(0.3);
 		//Title
-		this.add.text(150, 120, 'Pay Fines Service', {
+		this.add.text(150, 120, 'Light Vehicle License Service', {
 			fontSize: '16px',
 			fill: '#000',
 			wordWrap: { width: 200, useAdvancedWrap: true }
@@ -43,7 +46,7 @@ export default class vehicleLicensePopUp extends Phaser.Scene {
 			wordWrap: { width: 150, useAdvancedWrap: true }
 		});
 		button.setInteractive();
-		button.on('pointerdown', function() {
+		button.on('pointerdown', () => {
 			// Change the button texture to the pressed down state
 			console.log('button pressed');
 			button.setTexture('buttonPress');
@@ -70,7 +73,7 @@ export default class vehicleLicensePopUp extends Phaser.Scene {
 			wordWrap: { width: 150, useAdvancedWrap: true }
 		});
 		button2.setInteractive();
-		button2.on('pointerdown', function() {
+		button2.on('pointerdown', () => {
 			// Change the button texture to the pressed down state
 			console.log('button pressed');
 			button2.setTexture('buttonPress');
@@ -79,7 +82,7 @@ export default class vehicleLicensePopUp extends Phaser.Scene {
 		button2.on('pointerup', () => {
 			button2.setTexture('button');
 			button2.setTint(0x00FF00);
-			this.regist = true;
+			this.eye = true;
 		});
 		// third text box area
         const underText3 = this.add.image(205, 155 + 140, 'underText');
@@ -97,7 +100,7 @@ export default class vehicleLicensePopUp extends Phaser.Scene {
 			wordWrap: { width: 150, useAdvancedWrap: true }
 		});
 		button3.setInteractive();
-		button3.on('pointerdown', function() {
+		button3.on('pointerdown', () => {
 			// Change the button texture to the pressed down state
 			console.log('button pressed');
 			button3.setTexture('buttonPress');
@@ -106,7 +109,7 @@ export default class vehicleLicensePopUp extends Phaser.Scene {
 		button3.on('pointerup', () => {
 			button3.setTexture('button');
 			button3.setTint(0x00FF00);
-			this.license = true;
+			this.nol = true;
 		});
 		// close button
         const closeButton = this.add.image(330, 350, 'button');
@@ -122,15 +125,35 @@ export default class vehicleLicensePopUp extends Phaser.Scene {
 			wordWrap: { width: 150, useAdvancedWrap: true }
 		});
 		closeButton.setInteractive();
-		closeButton.on('pointerdown', function() {
+		closeButton.on('pointerdown', () => {
 			// Change the button texture to the pressed down state
 			console.log('close button pressed');
 			closeButton.setTexture('buttonPress');
 		});
 		closeButton.on('pointerup', () => {
 			closeButton.setTexture('button');
-			if (this.eid == true && this.regist == true && this.license == true)
-				this.scene.remove('vehicleLicensePopUp');
+			if (this.eid == true && this.eye == true && this.nol == true)
+			{
+				console.log('close button pressed');
+				if (spendMoney(600) == true)
+				{
+					button2.setTint(0x00FF00);
+					addLicense();
+					this.scene.remove('vehicleLicensePopUp');
+				}
+				else
+				{
+					closeButton.setTint(0xFF0000);
+					setTimeout(() => {
+						this.scene.remove('vehicleLicensePopUp'); // Reset collision cooldown after a certain period
+					}, 2000); // Adjust the cooldown period as needed (in milliseconds)
+				}
+			}else{
+				closeButton.setTint(0xFF0000);
+				setTimeout(() => {
+					this.scene.remove('vehicleLicensePopUp'); // Reset collision cooldown after a certain period
+				}, 2000); // Adjust the cooldown period as needed (in milliseconds)
+			}
 		});
     }
 }

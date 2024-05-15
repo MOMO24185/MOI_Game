@@ -1,5 +1,5 @@
 import { loadCharacterAnims, playerMovement } from "/static/character.js";
-import { interactWithCar, loadCar, saveCar, carMovement, handleExitCar } from "/static/carStatus.js";
+import { interactWithCar, loadCar, startCollisionCooldown, carMovement, handleExitCar, loadInsideCar, setInsideCar, handleEnterCar } from "/static/carStatus.js";
 import { loadRegistration, addRegistration, saveRegistration } from "/static/registerFunctions.js";
 import { loadLicense, addLicense, saveLicense } from "/static/licenseFunctions.js";
 import { loadFine, addFine, saveFine, payFine } from "/static/fineFunctions.js";
@@ -58,7 +58,6 @@ class MainGameScene extends Phaser.Scene {
 		this.registration  = 0;
 		this.license = 0;
 		this.fine = 0;
-		this.money = 0;
 		// Make tilemap
 		this.map = this.make.tilemap({ key: 'city' })
 		// Load UI elements outside of visible range
@@ -84,11 +83,14 @@ class MainGameScene extends Phaser.Scene {
 		//Adding player sprite
 		this.player = this.physics.add.sprite(400, 965, 'player', 'idle_down_1.png');
 		this.player.setBodySize(10, 10);
-		this.player.insideCar = false;
+		this.player.insideCar = 0;
+		setInsideCar(this.player.insideCar, 0)
 		//Adding car sprite
-		this.car = this.physics.add.sprite(400, 800, 'car');
+		const rotationInDegrees = 67.5;
+		const rotationInRadians = Phaser.Math.DegToRad(rotationInDegrees);
+		this.car = this.physics.add.sprite(1120, 690, 'car').setRotation(rotationInDegrees);
 		this.car.setScale(0.23);
-		this.car.setBodySize(120, 260);
+		this.car.setBodySize(260, 120);
 		const buildingLayer = this.map.createLayer('Building', cityTiles);
 		const treesLayer = this.map.createLayer('Trees', cityTiles);
 
@@ -110,10 +112,10 @@ class MainGameScene extends Phaser.Scene {
 
 		//Adding car collision
 		this.car.setCollideWorldBounds(true);
-		this.physics.add.collider(this.car, borderLayer);
-		this.physics.add.collider(this.car, objectsLayer);
-		this.physics.add.collider(this.car, buildingLayer);
-		this.physics.add.collider(this.car, treesLayer);
+		this.physics.add.collider(this.car, borderLayer, () => addFine(10), null, this);
+		this.physics.add.collider(this.car, objectsLayer, () => addFine(25), null, this);
+		this.physics.add.collider(this.car, buildingLayer, () => addFine(25), null, this);
+		this.physics.add.collider(this.car, treesLayer, () => addFine(20), null, this);
 		this.car.body.setImmovable(true);
 
 		//Adding player collision
@@ -127,15 +129,16 @@ class MainGameScene extends Phaser.Scene {
 
 		this.cameras.main.followOffset.set(0, 0);
 		//Loading money
+		this.money = loadMoney(this);
 		this.moneyText = this.add.text(10, 10, 'Money: ' + this.money, {
 			fontSize: '24px',
 			fill: '#000',
 			wordWrap: { width: 200, useAdvancedWrap: true }
 		});
-		loadMoney(this);
 		loadLicense(this);
 		loadRegistration(this);
-		loadFine(this);
+		this.fine = loadFine();
+		saveFine(this.fine);
 		loadCar(this);
 
 		// Define interaction button
@@ -182,12 +185,14 @@ class MainGameScene extends Phaser.Scene {
 		this.scene.launch('servicesPopUpScene');
     }
 
-	handleEnterCar() {
-
-	}
-
     update() 
 	{
+		this.money = loadMoney(this);
+		this.moneyText.setText('Money: ' + this.money);
+		loadLicense(this);
+		loadRegistration(this);
+		loadFine(this);
+		loadCar(this);
 		//Offset money UI with camera positioning
 		this.camX = this.cameras.main.scrollX;
 		this.camY = this.cameras.main.scrollY;
@@ -195,7 +200,19 @@ class MainGameScene extends Phaser.Scene {
 		this.welcomeMessage.y = this.player.y - 40;
 		this.moneyText.x = this.cameras.main.scrollX + 10;
 		this.moneyText.y = this.cameras.main.scrollY + 10;
-		if (this.player.insideCar == false)
+		if (this.player.insideCar == 0)
+		{
+			this.player.insideCar = loadInsideCar();
+			if (this.player.insideCar == 1)
+				handleEnterCar(this);
+		}
+		if (this.player.insideCar == 1)
+		{
+			this.player.insideCar = loadInsideCar();
+			if (this.player.insideCar == 0)
+				handleExitCar(this);
+		}
+		if (this.player.insideCar == 0)
 		{
 			playerMovement(this);
 		}
@@ -212,10 +229,11 @@ function interact(scene)
 	// console.log("Interaction area = " + this.interactionArea.getBounds().x + " " + this.interactionArea.getBounds().y + " Player = " + this.player.x + " " + this.player.y);
 	console.log("Player is inside car? " + this.player.insideCar);
 	// Check if player is inside car
-	if (this.player.insideCar == true)
+	if (this.player.insideCar == 1)
 	{
 		// If player is inside car, exit car
-		this.player.insideCar = false;
+		this.player.insideCar = 0;
+		setInsideCar(this.player.insideCar, 0);
 		handleExitCar(this);
 	}
 	// Check for interaction with police station

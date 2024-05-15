@@ -1,3 +1,5 @@
+import { payFine, loadFine } from "/static/fineFunctions.js";
+
 // Define an overlay scene
 export default class payFinePopUp extends Phaser.Scene {
     constructor() {
@@ -111,7 +113,7 @@ export default class payFinePopUp extends Phaser.Scene {
 		// close button
         const closeButton = this.add.image(330, 350, 'button');
 		closeButton.setScale(1.2);
-		this.add.text(150, 342, 'Fine Amount: ' + 200, {
+		this.add.text(150, 342, 'Fine Amount: ' + loadFine(), {
 			fontSize: '14px',
 			fill: '#000',
 			wordWrap: { width: 150, useAdvancedWrap: true }
@@ -130,7 +132,21 @@ export default class payFinePopUp extends Phaser.Scene {
 		closeButton.on('pointerup', () => {
 			closeButton.setTexture('button');
 			if (this.eid == true && this.regist == true && this.license == true)
-				this.scene.remove('payFinePopUp');
+				{
+					if (payFine() == true)
+					{
+					closeButton.setTint(0x00FF00);
+					setTimeout(() => {
+						this.scene.remove('payFinePopUp'); // Reset collision cooldown after a certain period
+					}, 2000); // Adjust the cooldown period as needed (in milliseconds)
+					}
+					else{
+					closeButton.setTint(0xFF0000);
+   					setTimeout(() => {
+						this.scene.remove('payFinePopUp'); // Reset collision cooldown after a certain period
+    				}, 2000); // Adjust the cooldown period as needed (in milliseconds)
+					}
+				}
 		});
     }
 }

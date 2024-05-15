@@ -1,17 +1,20 @@
-export function addRegistration(scene) {
-    scene.registration = 1;
-    saveRegistration(scene.registration);
+export function addRegistration() {
+	console.log('inside add regist');
+    saveRegistration(1);
+	console.log('done add regist');
 }
 
 export function saveRegistration(registration) {
 	localStorage.setItem('registration', registration);
+	console.log('finished storing regist');
 }
 
-export function loadRegistration(scene) {
+export function loadRegistration() {
+	var registration;
 	var savedRegistration = localStorage.getItem('registration');
 	if (savedRegistration !== null)
-		scene.registration = parseInt(savedRegistration);
+		registration = parseInt(savedRegistration);
 	else
-		scene.registration = 0;
-	saveRegistration(scene.registration);
+		return 0;
+	return registration;
 }

@@ -1,17 +1,17 @@
-export function addLicense(scene) {
-    scene.license = 1;
-    saveLicense(scene.license);
+export function addLicense() {
+    saveLicense(1);
 }
 
 export function saveLicense(license) {
 	localStorage.setItem('license', license);
 }
 
-export function loadLicense(scene) {
+export function loadLicense() {
+	var license;
 	var savedLicense = localStorage.getItem('license');
 	if (savedLicense !== null)
-		scene.license = parseInt(savedLicense);
+		license = parseInt(savedLicense);
 	else
-		scene.license = 0;
-	saveLicense(scene.license);
+		license = 0;
+	return license;
 }

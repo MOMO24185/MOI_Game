@@ -1,3 +1,8 @@
+import { spendMoney } from "/static/moneyFunctions.js";
+import { loadRegistration } from "/static/registerFunctions.js";
+import { loadLicense } from "/static/licenseFunctions.js";
+import { saveCar } from "/static/carStatus.js";
+
 // Define an overlay scene
 export default class buyCarPopUpScene extends Phaser.Scene {
     constructor() {
@@ -59,7 +64,19 @@ export default class buyCarPopUpScene extends Phaser.Scene {
 		});
 		button2.on('pointerup', () => {
 			button2.setTexture('button');
-			this.scene.stop('buyCarPopUpScene');
+			if (loadLicense() == 1 && loadRegistration() == 1 && spendMoney(2000) == true)
+			{
+				button2.setTint(0x00FF00);
+				saveCar(1);
+				this.scene.stop('buyCarPopUpScene');
+			}
+			else
+			{
+				button2.setTint(0xFF0000);
+				setTimeout(() => {
+					this.scene.stop('buyCarPopUpScene'); // Reset collision cooldown after a certain period
+				}, 2000); // Adjust the cooldown period as needed (in milliseconds)
+			}
 		});
     }
 }

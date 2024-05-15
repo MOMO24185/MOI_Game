@@ -1,3 +1,6 @@
+import { spendMoney } from "/static/moneyFunctions.js";
+import { addRegistration } from "/static/registerFunctions.js";
+
 // Define an overlay scene
 export default class registerVehiclePopUp extends Phaser.Scene {
     constructor() {
@@ -21,7 +24,7 @@ export default class registerVehiclePopUp extends Phaser.Scene {
         const dialogBox = this.add.image(250, 245, 'dialogBox');
 		dialogBox.setScale(0.3);
 		//Title
-		this.add.text(150, 120, 'Pay Fines Service', {
+		this.add.text(150, 120, 'Register Vehicle Service', {
 			fontSize: '16px',
 			fill: '#000',
 			wordWrap: { width: 200, useAdvancedWrap: true }
@@ -36,17 +39,16 @@ export default class registerVehiclePopUp extends Phaser.Scene {
 			fill: '#000',
 			wordWrap: { width: 100, useAdvancedWrap: true }
 		});
-		this.add.text(150, 140 + 20, 'Add EID', {
+		this.add.text(150, 140 + 20, 'Emirates ID', {
 			fontSize: '16px',
 			fill: '#000',
 			wordWrap: { width: 150, useAdvancedWrap: true }
 		});
 		button.setInteractive();
-		button.on('pointerdown', function() {
+		button.on('pointerdown', () => {
 			// Change the button texture to the pressed down state
 			console.log('button pressed');
 			button.setTexture('buttonPress');
-			// handleButtonClick();
 		});
 		button.on('pointerup', () => {
 			button.setTexture('button');
@@ -69,16 +71,25 @@ export default class registerVehiclePopUp extends Phaser.Scene {
 			wordWrap: { width: 150, useAdvancedWrap: true }
 		});
 		button2.setInteractive();
-		button2.on('pointerdown', function() {
+		button2.on('pointerdown', () => {
 			// Change the button texture to the pressed down state
 			console.log('button pressed');
 			button2.setTexture('buttonPress');
-			// handleButtonClick();
+			if (spendMoney(350) == true)
+			{
+				button2.setTint(0x00FF00);
+				this.fee = true;
+			}
+			else
+			{
+				button2.setTint(0xFF0000);
+				setTimeout(() => {
+					this.scene.remove('registerVehiclePopUp'); // Reset collision cooldown after a certain period
+				}, 2000); // Adjust the cooldown period as needed (in milliseconds)
+			}
 		});
 		button2.on('pointerup', () => {
 			button2.setTexture('button');
-			button2.setTint(0x00FF00);
-			this.fee = true;
 		});
 		// close button
         const closeButton = this.add.image(260, 350, 'button');
@@ -89,7 +100,7 @@ export default class registerVehiclePopUp extends Phaser.Scene {
 			wordWrap: { width: 150, useAdvancedWrap: true }
 		});
 		closeButton.setInteractive();
-		closeButton.on('pointerdown', function() {
+		closeButton.on('pointerdown', () => {
 			// Change the button texture to the pressed down state
 			console.log('close button pressed');
 			closeButton.setTexture('buttonPress');
@@ -97,7 +108,16 @@ export default class registerVehiclePopUp extends Phaser.Scene {
 		closeButton.on('pointerup', () => {
 			closeButton.setTexture('button');
 			if (this.eid == true && this.fee == true)
+			{
+				console.log('close button pressed');
+				addRegistration();
 				this.scene.remove('registerVehiclePopUp');
+			}else{
+				closeButton.setTint(0xFF0000);
+				   setTimeout(() => {
+					this.scene.remove('registerVehiclePopUp'); // Reset collision cooldown after a certain period
+				}, 2000); // Adjust the cooldown period as needed (in milliseconds)
+				}
 		});
     }
 }

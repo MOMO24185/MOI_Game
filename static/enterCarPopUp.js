@@ -1,3 +1,5 @@
+import { loadInsideCar, setInsideCar } from "/static/carStatus.js";
+
 // Define an overlay scene
 export default class enterCarPopUpScene extends Phaser.Scene {
     constructor() {
@@ -36,7 +38,8 @@ export default class enterCarPopUpScene extends Phaser.Scene {
 			// Change the button texture to the pressed down state
 			console.log('button pressed');
 			button.setTexture('buttonPress');
-			// handleButtonClick();
+			var InsideCar = loadInsideCar();
+			setInsideCar(InsideCar, 0);
 		});
 		button.on('pointerup', () => {
 			button.setTexture('button');
@@ -55,7 +58,8 @@ export default class enterCarPopUpScene extends Phaser.Scene {
 			// Change the button texture to the pressed down state
 			console.log('button pressed');
 			button2.setTexture('buttonPress');
-			// handleButtonClick();
+			var InsideCar = loadInsideCar();
+			setInsideCar(InsideCar, 1);
 		});
 		button2.on('pointerup', () => {
 			button2.setTexture('button');

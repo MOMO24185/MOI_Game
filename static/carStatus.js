@@ -2,45 +2,52 @@ import { loadMoney, earnMoney, spendMoney, saveMoney } from "/static/moneyFuncti
 import buyCarPopUpScene from "/static/buyCarPopUp.js";
 import enterCarPopUpScene from "/static/enterCarPopUp.js";
 
-function startCollisionCooldown(scene) {
+export function startCollisionCooldown(scene, amount) {
     scene.collisionCooldown = true;
     setTimeout(() => {
         scene.collisionCooldown = false; // Reset collision cooldown after a certain period
-    }, 1000); // Adjust the cooldown period as needed (in milliseconds)
+    }, amount); // Adjust the cooldown period as needed (in milliseconds)
 }
 
-export function handleBuyCar(scene){
-	if (spendMoney(scene, 2000))
-	{
-		scene.carStatus = true;
-		saveCar();
-		console.log('Bought car');
-	}
+export function setInsideCar(InsideCar, value) {
+	InsideCar = value;
+	saveInsideCar(InsideCar);
+}
+
+export function saveInsideCar(InsideCar) {
+	localStorage.setItem('InsideCar', InsideCar);
+}
+
+export function loadInsideCar() {
+	var savedInsideCar = localStorage.getItem('InsideCar');
+	if (savedInsideCar !== null)
+		savedInsideCar = parseInt(savedInsideCar);
+	else
+		savedInsideCar = 0;
+		saveInsideCar(savedInsideCar);
+	return savedInsideCar;
 }
 
 export function handleExitCar(scene)
 {
+    scene.collisionCooldown = true;
 	// Set player position to the car position
 	scene.player.x = scene.car.x;
-	scene.player.y = scene.car.y;
+	scene.player.y = scene.car.y + 20;
 
 	// Set player to visible when he exits the car
 	scene.player.setVisible(true);
 
-	// Set insideCar to false
-	scene.player.insideCar = false;
-
 	// Make camera follow the player
 	scene.cameras.main.startFollow(scene.player);
 	scene.cameras.main.followOffset.set(0, 0);
+	setInsideCar(scene.player.InsideCar, 0);
+	startCollisionCooldown(scene, 5000);
 }
 
 export function handleEnterCar(scene){
 	// Set player to invisible when he enters the car
-	scene.player.setVisible(false);
-	
-	// Set insideCar to true
-	scene.player.insideCar = true;
+	scene.player.setPosition(-1000, -1000);
 
 	// Stop car movement
 	scene.car.setVelocityX(0);
@@ -55,13 +62,12 @@ export function handleEnterCar(scene){
 	console.log("handleEnterCar");
 }
 
-export function saveCar(scene) {
-	localStorage.setItem('carStatus', scene.carStatus);
+export function saveCar(carStatus) {
+	localStorage.setItem('carStatus', carStatus);
 }
 
 export function loadCar(scene) {
 	var savedCar = localStorage.getItem('carStatus');
-	console.log(scene.carStatus);
 	if (savedCar !== null)
 	{
 		savedCar = parseInt(savedCar);
@@ -72,20 +78,16 @@ export function loadCar(scene) {
 	}
 	else
 		scene.carStatus = 0;
-	saveCar(scene);
+	saveCar(scene.carStatus);
 }
 
 export function interactWithCar(scene) {// Check if the player owns the car
-    console.log('Player collided with the car');
 	loadCar(scene);
     if (scene.carStatus == 1 && !scene.confirmationDialogOpened && !scene.collisionCooldown) {
-		startCollisionCooldown(scene);
+		startCollisionCooldown(scene, 1000);
 		scene.confirmationDialogOpened = true;
         console.log('Player owns the car.');
       	// Display a popup with options to enter the car
-		const dataToSend = {
-			
-		}
 		this.scene.launch('enterCarPopUpScene');
     } else if (!scene.confirmationDialogOpened && !scene.collisionCooldown) {
 		scene.confirmationDialogOpened = true; 
@@ -98,30 +100,45 @@ export function interactWithCar(scene) {// Check if the player owns the car
 
 export function carMovement(scene)
 {
-	if ((scene.cursors.up.isDown && scene.cursors.right.isDown) || (scene.cursors.down.isDown && scene.cursors.right.isDown)) {
-		scene.player.setAngularVelocity(100)
-	} else if ((scene.cursors.down.isDown && scene.cursors.left.isDown) || (scene.cursors.up.isDown && scene.cursors.left.isDown)) {
-		scene.player.setAngularVelocity(-100)
-	} else {
-		scene.player.setAngularVelocity(0)
+	var rotationInDegrees = 0;
+	var rotationInRadians = 0;
+	scene.car.setVelocity(0);
+	if (!scene.car || !scene.cursors)
+			return;
+	if (scene.cursors.left.isDown)
+	{
+		rotationInDegrees = 90;
+		rotationInRadians = Phaser.Math.DegToRad(rotationInDegrees);
+		scene.car.setRotation(rotationInRadians);
+		scene.car.setBodySize(260, 120);
+		scene.car.setVelocity(-100, 0)
 	}
-  
-	const velX = Math.cos((player.angle - 360) * 0.01745)
-	const velY = Math.sin((player.angle - 360) * 0.01745)
-	if (scene.cursors.up.isDown) {
-		scene.player.setVelocityX(200 * velX)
-		scene.player.setVelocityY(200 * velY)
-	} else if (scene.cursors.down.isDown) {
-		scene.player.setVelocityX(-100 * velX)
-		scene.player.setVelocityY(-100 * velY)
-	} else {
-		scene.player.setAcceleration(0)
+	else if (scene.cursors.right.isDown)
+	{
+		rotationInDegrees = -90;
+		rotationInRadians = Phaser.Math.DegToRad(rotationInDegrees);
+		scene.car.setRotation(rotationInRadians);
+		scene.car.setBodySize(260, 120);
+		scene.car.setVelocity(100, 0)
 	}
-  
-	const currPosition = {
-		x: scene.player.x,
-		y: scene.player.y,
-		rotation: scene.player.rotation
+	else if (scene.cursors.up.isDown)
+	{
+		rotationInDegrees = 180;
+		rotationInRadians = Phaser.Math.DegToRad(rotationInDegrees);
+		scene.car.setRotation(rotationInRadians);
+		scene.car.setBodySize(120, 260);
+		scene.car.setVelocity(0, -100)
 	}
-	scene.player.oldPosition = currPosition
+	else if (scene.cursors.down.isDown)
+	{
+		rotationInDegrees = 360;
+		rotationInRadians = Phaser.Math.DegToRad(rotationInDegrees);
+		scene.car.setRotation(rotationInRadians);
+		scene.car.setBodySize(120, 260);
+		scene.car.setVelocity(0, 100)
+	}
+	else
+	{
+		scene.car.setVelocity(0, 0)
+	}
 }
