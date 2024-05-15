@@ -5,6 +5,7 @@
 
   To preview and run the project on your device:
   1) Open project folder in <a href="https://code.visualstudio.com/download">Visual Studio Code</a>
-  2) In the terminal, run `npm install`
-  3) Run `npm start` to view project in browser
+  2) In the terminal run those commands,cd MOE_Game -> npm install -> npm start
+  3) then in another terminal cd MOE_web -> npm install -> npm start
+  4) then open your chrome browser then type-> http://localhost:3000/
   
