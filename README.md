@@ -30,8 +30,8 @@ This demo has 3 features implemented:
 
 ## Team
 - [Imane Sghiouar](https://github.com/emy-sg)
-- [Mahmoud Elshafi](https://github.com/MOMO24185)
 - [Yoseph Tapano](https://github.com/Jo2831)
+- [Mahmoud Elshafi](https://github.com/MOMO24185)
 - [Obada Outabachi](https://github.com/0bada1)
-- [Mohamed Ali Alsherif](https://github.com/KingMohamedAlsherif)
 - [Taha Helmi](github.com/Thelmi)
+- [Mohamed Ali Alsherif](https://github.com/KingMohamedAlsherif)
