@@ -32,14 +32,14 @@ To preview and run the project on your device:
 1) Open project folder in <a href="https://code.visualstudio.com/download">Visual Studio Code</a>
 2) In the terminal run those commands, `cd MOE_Game` -> `npm install` -> `npm start`
 3) then in another terminal `cd MOE_web` -> `npm install` -> `npm start`
-4) then open your chrome browser then type-> http://localhost:3000/
+4) then open your chrome browser then type-> `http://localhost:3000/`
 
 ## MOI_Game
 
-- To run the game run in terminal: `cd MOI_Game`
-- Install python3 if not installed
-- Then run `python3 -m http.server` to run the server
-- Open `localhost:8000` in the browser
+1) Open project folder in <a href="https://code.visualstudio.com/download">Visual Studio Code</a>
+2) In the terminal run those commands, `cd MOE_Game` -> `npm install` -> `npm start`
+3) then in another terminal `cd MOE_web` -> `npm install` -> `Node server.js`
+4) Open `localhost:8080` in the browser
 
 ## Team
 - [Imane Sghiouar](https://github.com/emy-sg)
