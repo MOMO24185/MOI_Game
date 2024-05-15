@@ -1,7 +1,12 @@
 import { loadCharacterAnims, playerMovement } from "/static/character.js";
-import { interactWithCar, loadCar, saveCar, carMovement } from "/static/carStatus.js";
+import { interactWithCar, loadCar, saveCar, carMovement, handleExitCar } from "/static/carStatus.js";
+import { loadRegistration, addRegistration, saveRegistration } from "/static/registerFunctions.js";
+import { loadLicense, addLicense, saveLicense } from "/static/licenseFunctions.js";
+import { loadFine, addFine, saveFine, payFine } from "/static/fineFunctions.js";
 import { loadMoney, earnMoney, spendMoney, saveMoney } from "/static/moneyFunctions.js";
 import servicesPopUpScene from "/static/servicesPopUp.js";
+import buyCarPopUpScene from "/static/buyCarPopUp.js";
+import enterCarPopUpScene from "/static/enterCarPopUp.js";
 
 class MainGameScene extends Phaser.Scene {
 	constructor() {
@@ -38,12 +43,21 @@ class MainGameScene extends Phaser.Scene {
 	}
 
     create()
-	{// Define Speed
+	{
+		//Adding some dialog scenes
+		const enterCar = new enterCarPopUpScene();
+		this.scene.add('enterCarPopUpScene', enterCar);
+		const buyCar = new buyCarPopUpScene();
+		this.scene.add('buyCarPopUpScene', buyCar);
+		// Define Speed
 		this.carStatus = 0;
-		this.speed = 150;
+		this.speed = 250;
 		this.confirmationDialogOpened = false;
 		this.collisionCooldown = false;
 		// Set up users money
+		this.registration  = 0;
+		this.license = 0;
+		this.fine = 0;
 		this.money = 0;
 		// Make tilemap
 		this.map = this.make.tilemap({ key: 'city' })
@@ -60,7 +74,6 @@ class MainGameScene extends Phaser.Scene {
 		const Trees = this.map.addTilesetImage('Trees', 'Trees')
 
 		this.player = this.textures.get('player')
-		this.welcomeMessage = this.textures.get('welcomeMessage')
 
 		// add Tilesets to map layers
 		const cityTiles = [city, Objects, buildings, FireStation, PoliceStation, Trees];
@@ -71,12 +84,11 @@ class MainGameScene extends Phaser.Scene {
 		//Adding player sprite
 		this.player = this.physics.add.sprite(400, 965, 'player', 'idle_down_1.png');
 		this.player.setBodySize(10, 10);
+		this.player.insideCar = false;
 		//Adding car sprite
 		this.car = this.physics.add.sprite(400, 800, 'car');
 		this.car.setScale(0.23);
 		this.car.setBodySize(120, 260);
-		this.welcomeMessage = this.add.sprite(400 + 35, 960 - 40, 'welcomeMessage', 'welcome0.png');
-		this.welcomeMessage.setScale(0.30);
 		const buildingLayer = this.map.createLayer('Building', cityTiles);
 		const treesLayer = this.map.createLayer('Trees', cityTiles);
 
@@ -121,6 +133,9 @@ class MainGameScene extends Phaser.Scene {
 			wordWrap: { width: 200, useAdvancedWrap: true }
 		});
 		loadMoney(this);
+		loadLicense(this);
+		loadRegistration(this);
+		loadFine(this);
 		loadCar(this);
 
 		// Define interaction button
@@ -129,6 +144,9 @@ class MainGameScene extends Phaser.Scene {
 		this.interactionButton.on('spacedown', interact, this); // Set up event listener for button press
 
 		// Create welcome message animation
+		this.welcomeMessage = this.textures.get('welcomeMessage')
+		this.welcomeMessage = this.add.sprite(400 + 35, 960 - 40, 'welcomeMessage', 'welcome0.png');
+		this.welcomeMessage.setScale(0.30);
 		this.welcomeMessage.anims.create({
 			key: 'welcomeMessage',
 			frames: this.anims.generateFrameNames('welcomeMessage', {start: 0, end: 37, prefix: 'welcome', suffix: '.png'}),
@@ -137,6 +155,14 @@ class MainGameScene extends Phaser.Scene {
 		});
 
 		this.welcomeMessage.anims.play('welcomeMessage', true);
+		this.welcomeMessage.on('animationcomplete', () => {
+			// Close the scene after the animation completes
+			this.time.delayedCall(2000, () => {
+				// Stop the scene
+				this.welcomeMessage.anims.stop();
+				this.welcomeMessage.destroy();
+			});
+		});
 		//Setting up character sprite
 		//Preparing character animations
 		//Idle anims
@@ -156,6 +182,10 @@ class MainGameScene extends Phaser.Scene {
 		this.scene.launch('servicesPopUpScene');
     }
 
+	handleEnterCar() {
+
+	}
+
     update() 
 	{
 		//Offset money UI with camera positioning
@@ -165,14 +195,29 @@ class MainGameScene extends Phaser.Scene {
 		this.welcomeMessage.y = this.player.y - 40;
 		this.moneyText.x = this.cameras.main.scrollX + 10;
 		this.moneyText.y = this.cameras.main.scrollY + 10;
-		playerMovement(this);
+		if (this.player.insideCar == false)
+		{
+			playerMovement(this);
+		}
+		else
+		{
+			carMovement(this);
+		}
     }
 }
 
 function interact(scene)
 {
 	console.log("Interacting");
-	console.log("Interaction area = " + this.interactionArea.getBounds().x + " " + this.interactionArea.getBounds().y + " Player = " + this.player.x + " " + this.player.y);
+	// console.log("Interaction area = " + this.interactionArea.getBounds().x + " " + this.interactionArea.getBounds().y + " Player = " + this.player.x + " " + this.player.y);
+	console.log("Player is inside car? " + this.player.insideCar);
+	// Check if player is inside car
+	if (this.player.insideCar == true)
+	{
+		// If player is inside car, exit car
+		this.player.insideCar = false;
+		handleExitCar(this);
+	}
 	// Check for interaction with police station
 	if (this.player.x >= this.interactionArea.getBounds().x &&
 	 this.player.x <= this.interactionArea.getBounds().x + 50 && this.player.y >= this.interactionArea.getBounds().y 
@@ -184,6 +229,7 @@ function interact(scene)
 		// Otherwise, hide button and do nothing
 		// this.interactionButton.visible = false;
 		console.log("Not interacting with police station!");
+		this.interactionButton.visible = false;
 	}
 }
 function policeStationInteract(scene)

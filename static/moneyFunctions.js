@@ -1,13 +1,13 @@
 export function earnMoney(scene, amount) {
     scene.money += amount;
     scene.moneyText.setText('Money: ' + scene.money);
-    saveMoney();
+    saveMoney(scene.money);
 }
 
 export function spendMoney(scene, amount) {
 	if (scene.money >= amount) {
 		scene.money -= amount;
-		saveMoney();
+		saveMoney(scene.money);
 		scene.moneyText.setText('Money: ' + scene.money);
 		// Perform actions associated with spending money
 		return true;
@@ -17,7 +17,7 @@ export function spendMoney(scene, amount) {
 	}
 }
 
-export function saveMoney() {
+export function saveMoney(money) {
 	localStorage.setItem('money', money);
 }
 
