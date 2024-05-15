@@ -6,8 +6,8 @@ import PopUpScene from "/static/pop_up.js";
 function interact(scene)
 {
 	console.log("Interacting");
-	// console.log("Interaction area = " + this.interactionArea.getBounds().x + " " + this.interactionArea.getBounds().y + " Player = " + this.player.x + " " + this.player.y);
-	console.log("Player is inside car? " + this.player.insideCar);
+	console.log("Interaction area = " + this.policeStationInteractionArea.getBounds().x + " " + this.policeStationInteractionArea.getBounds().y + " Player = " + this.player.x + " " + this.player.y);
+	// console.log("Player is inside car? " + this.player.insideCar);
 	
 	// Check if player is inside car
 	if (this.player.insideCar == true)
@@ -18,16 +18,43 @@ function interact(scene)
 		}
 		
 	// Check for interaction with police station
-	if (this.player.x >= this.interactionArea.getBounds().x &&
-	 this.player.x <= this.interactionArea.getBounds().x + 50 && this.player.y >= this.interactionArea.getBounds().y 
-	 && this.player.y <= this.interactionArea.getBounds().y + 50) {
-		// If player is inside interaction area and not currently this.interacting, show button
+	if (this.player.x >= this.policeStationInteractionArea.getBounds().x &&
+	 this.player.x <= this.policeStationInteractionArea.getBounds().x + 50 && this.player.y >= this.policeStationInteractionArea.getBounds().y 
+	 && this.player.y <= this.policeStationInteractionArea.getBounds().y + 50) {
 		this.interactionButton.visible = true;
 		policeStationInteract(this);
 	} else {
-		// Otherwise, hide button and do nothing
 		this.interactionButton.visible = false;
-		// console.log("Not interacting with police station!");
+	}
+
+	// Check for interaction with the hospital
+	if (this.player.x >= this.hosiptalInteractionArea.getBounds().x &&
+	 this.player.x <= this.hosiptalInteractionArea.getBounds().x + 50 && this.player.y >= this.hosiptalInteractionArea.getBounds().y 
+	 && this.player.y <= this.hosiptalInteractionArea.getBounds().y + 50) {
+		this.interactionButton.visible = true;
+		hospitalInteract(this);
+	} else {
+		this.interactionButton.visible = false;
+	}
+
+	// Check for interaction with the fire station
+	if (this.player.x >= this.fireStationInteractionArea.getBounds().x &&
+	 this.player.x <= this.fireStationInteractionArea.getBounds().x + 35 && this.player.y >= this.fireStationInteractionArea.getBounds().y 
+	 && this.player.y <= this.fireStationInteractionArea.getBounds().y + 35) {
+		this.interactionButton.visible = true;
+		fireStationInteract(this);
+	} else {
+		this.interactionButton.visible = false;
+	}
+
+	// Check for interaction with the house
+	if (this.player.x >= this.spawnHouseInteractionArea.getBounds().x &&
+	 this.player.x <= this.spawnHouseInteractionArea.getBounds().x + 30 && this.player.y >= this.spawnHouseInteractionArea.getBounds().y 
+	 && this.player.y <= this.spawnHouseInteractionArea.getBounds().y + 30) {
+		this.interactionButton.visible = true;
+		spawnHouseInteract(this);
+	} else {
+		this.interactionButton.visible = false;
 	}
 }
 
@@ -35,6 +62,28 @@ function policeStationInteract(scene)
 {
 	console.log("Interacting with police station!");
 	// Put interaction with police station code here
+	scene.showOverlay();
+}
+
+function hospitalInteract(scene)
+{
+	console.log("Interacting with hospital!");
+	// Put interaction with hospital code here
+	scene.showOverlay();
+}
+
+function fireStationInteract(scene)
+{
+	console.log("Interacting with fire station!");
+	// Put interaction with fire station code here
+	scene.showOverlay();
+
+}
+
+function spawnHouseInteract(scene)
+{
+	console.log("Interacting with spawn house!");
+	// Put interaction with spawn house code here
 	scene.showOverlay();
 }
 
@@ -68,8 +117,17 @@ class MainGameScene extends Phaser.Scene {
 		
 		// Define interaction areas
 		this.interacting = false;
-		this.interactionArea = this.add.rectangle(600, 310, 50, 50, 0xff0000); // 50x50 interaction area at police station entrance
-		this.physics.add.existing(this.interactionArea, true); // Enable physics for collision detection
+		this.policeStationInteractionArea = this.add.rectangle(600, 310, 50, 50, 0xff0000); // 50x50 interaction area at police station entrance
+		this.physics.add.existing(this.policeStationInteractionArea, true); // Enable physics for collision detection
+
+		this.hosiptalInteractionArea = this.add.rectangle(863, 660, 50, 50, 0xff0000); // 50x50 interaction area at hospital entrance
+		this.physics.add.existing(this.hosiptalInteractionArea, true); // Enable physics for collision detection
+
+		this.fireStationInteractionArea = this.add.rectangle(1123, 330, 35, 35, 0xff0000); // 35x35 interaction area at fire station entrance
+		this.physics.add.existing(this.fireStationInteractionArea, true); // Enable physics for collision detection
+
+		this.spawnHouseInteractionArea = this.add.rectangle(400, 950, 30, 30, 0xff0000); // 30x30 interaction area at house entrance
+		this.physics.add.existing(this.spawnHouseInteractionArea, true); // Enable physics for collision detection
 	}
 
     create()
