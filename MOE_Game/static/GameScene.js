@@ -226,8 +226,6 @@ class MainGameScene extends Phaser.Scene {
 function interact(scene)
 {
 	console.log("Interacting");
-	// console.log("Interaction area = " + this.interactionArea.getBounds().x + " " + this.interactionArea.getBounds().y + " Player = " + this.player.x + " " + this.player.y);
-	console.log("Player is inside car? " + this.player.insideCar);
 	// Check if player is inside car
 	if (this.player.insideCar == 1)
 	{
@@ -244,9 +242,6 @@ function interact(scene)
 		this.interactionButton.visible = true;
 		policeStationInteract(this);
 	} else {
-		// Otherwise, hide button and do nothing
-		// this.interactionButton.visible = false;
-		console.log("Not interacting with police station!");
 		this.interactionButton.visible = false;
 	}
 }
