@@ -15,7 +15,7 @@ The Ministry Of Interior (MOI) of the United Arab Emirates hosted a 14 day hacka
 [//]: <> (This demo has 3 features implemented:)
 [//]: <> (### Game Gamification)
 
-[//]: <> (### Face Authentication)
+[//]: <> (### Eye tracking)
 
 [//]: <> (### Interactive UI/UX design)
 
