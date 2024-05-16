@@ -21,7 +21,7 @@ The Ministry Of Interior (MOI) of the United Arab Emirates hosted a 14 day hacka
 [//]: <> (This demo has 3 features implemented:)
 [//]: <> (### Game Gamification)
 
-[//]: <> (### Eye tracking
+[//]: <> (### Eye tracking)
 [//]: <> (- This feature helps people of determination who do not have the ability to freely navigate the website using a mouse and keyboard, the feature is still a Work in progress, but promises to make navigation much easier.)
 
 [//]: <> (### Interactive UI/UX design)
